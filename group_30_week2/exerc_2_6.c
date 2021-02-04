@@ -19,11 +19,11 @@
 
 // TODO: FIX so it shows -1 instead of bs
 // Initialize an empty queue with EMPTY_SPACE
-void initQue(int *list, int max)
+void initQue(int list[], int max)
 {
     for (int i = 0; i < max; i++)
     {
-        *list++ = -1;
+        list[i] = EMPTY_SPACE;
     }
 }
 
@@ -68,30 +68,30 @@ int output(int list[], int max)
 // init queue and run sequence of methods to test
 int main(void)
 {
-    int list[MAX]; // Init new queue
-    for (int i = 0; i < sizeof(list); i++) {
+    int list[MAX];
+    initQue(list, MAX); // Init new queue
+    for (int i = 0; i < MAX; i++) {
         printf("%d ", list[i]);
     }
     printf("\n");
-    initQue(list, MAX);
     input(list, 3, MAX);
     input(list, 4, MAX);
     input(list, 5, MAX);
     input(list, 6, MAX);
     input(list, 7, MAX);
     input(list, 8, MAX);
-    for (int i = 0; i < sizeof(list); i++) {
+    for (int i = 0; i < MAX; i++) {
         printf("%d ", list[i]);
     }
     printf("\n");
     output(list, MAX);
     output(list, MAX);
-    for (int i = 0; i < sizeof(list); i++) {
+    for (int i = 0; i < MAX; i++) {
         printf("%d ", list[i]);
     }
     printf("\n");
     input(list, 11, MAX);
-    for (int i = 0; i < sizeof(list); i++) {
+    for (int i = 0; i < MAX; i++) {
         printf("%d ", list[i]);
     }
     printf("\n");

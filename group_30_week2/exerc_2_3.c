@@ -19,6 +19,11 @@
  // take two strings and compare
  void compareString(char *string1, char *string2)
  {
+     // Compare string lengths
+    if (strlen(string1) != strlen(string2)) {
+        printf("The strings are not equal.");
+        return;
+    }
     while (*string1 != '\0') {
         // check if strings are not equal
         if (*string1++ != *string2++) {

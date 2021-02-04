@@ -52,6 +52,8 @@ void draw_histogram(int *freq)
     for (int i = 0; i < MAXNUMBER; i++) {
         if (freq[i] != 0) {
             printf("%d ", i);
+        } else {
+            continue;
         }
         for (int j = 0; j < freq[i]; j++) {
             printf("x");

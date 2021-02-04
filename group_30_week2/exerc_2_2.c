@@ -46,7 +46,5 @@ int main(void)
     // Print integer value and double value
     printDouble(arr);
     
-    // Free up the memory
-    free(arr);
     return 0;
 }

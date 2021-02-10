@@ -7,8 +7,7 @@
  Hugo Hempel
  Hjalmar Thunberg
  Member not present at demonstration time:
- Yyyyyy  yyyy
- Demonstration code: [<Ass code 1-4> <abc>]
+ Demonstration code: [6197]
  ====================================== */
 
 #include <stdio.h>

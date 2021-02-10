@@ -7,8 +7,7 @@
  Hugo Hempel
  Hjalmar Thunberg
  Member not present at demonstration time:
- Yyyyyy  yyyy
- Demonstration code: [<Ass code 1-4> <abc>]
+ Demonstration code: [6197]
  ====================================== */
 
 #include <stdio.h>
@@ -62,8 +61,8 @@ int output(int list[], int max)
             }
             return list[0];
         }
-        return 0;
     }
+    return 0;
 }
 // init queue and run sequence of methods to test
 int main(void)

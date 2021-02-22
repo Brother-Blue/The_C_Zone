@@ -37,8 +37,6 @@ public class ExampleTest {
 		r1.setAmtSugar("1");
 		r1.setPrice("50");
 
-		cm.addRecipe(r1);
-		
 		//Set up for r2
 		r2 = new Recipe();
 		r2.setName("Mocha");
@@ -48,8 +46,6 @@ public class ExampleTest {
 		r2.setAmtSugar("1");
 		r2.setPrice("75");
 
-		cm.addRecipe(r2);
-		
 		//Set up for r3
 		r3 = new Recipe();
 		r3.setName("Latte");
@@ -58,8 +54,6 @@ public class ExampleTest {
 		r3.setAmtMilk("3");
 		r3.setAmtSugar("1");
 		r3.setPrice("100");
-
-		cm.addRecipe(r3);
 
 		//Set up for r4
 		r4 = new Recipe();
@@ -70,53 +64,52 @@ public class ExampleTest {
 		r4.setAmtSugar("1");
 		r4.setPrice("65");
 
-		cm.addRecipe(r4);
 	}
 	
 	@Test
-	public void testAddInventory_Normal() {
+	public void testAddInventory() {
 		try {
-			cm.addInventory("4","7","0","9"); //Coffee, Milk, Sugar, Chocolate
-		} catch (InventoryException e) {
-			fail("InventoryException should not be thrown");
+			cm.addInventory("5", "5","5","5");
+		} catch (Exception e) {
+			System.out.println("addInventory caused error, should not have");
 		}
-		String inventory = cm.checkInventory();
-		String expected = "Coffee: 19\nMilk: 22\nSugar: 15\nChocolate: 24\n";
+		String expected = "Coffee: 20\nMilk: 20\nSugar: 20\nChocolate: 20\n";
 		// We start with 15 in inventory, then added some.
-		assertEquals(expected,inventory);
+		assertEquals(expected,cm.checkInventory());
 	}
-
-	/*
-	@Test
-	public void testAddInventoryException() {
-		Throwable exception = assertThrows(
-				InventoryException.class, () -> {
-					cm.addInventory("4", "-1", "asdf", "3"); // Should throw an InventoryException
-				}
-				);
-	}
-	 */
 	
 	@Test
-	public void testMakeCoffee_Normal() {
+	public void testMakeCoffee() {
 		cm.addRecipe(r1);
-		assertEquals(25, cm.makeCoffee(0, 75));
+		assertEquals(19,cm.makeCoffee(0,69));
+		assertEquals(45,cm.makeCoffee(0,45));
+		cm.deleteRecipe(0);
+		assertEquals(60,cm.makeCoffee(0,60));
+		assertEquals(-50,cm.makeCoffee(0,-50));
+
 	}
 	@Test
-	public void testAddRecipe() {
+	public void testAddRecipes() {
+		assertTrue(cm.addRecipe(r1));
 		assertTrue(cm.addRecipe(r2));
+		assertTrue(cm.addRecipe(r3));
+		assertTrue(cm.addRecipe(r4));
 	}
 	@Test
 	public void testDeleteRecipe() {
+		cm.addRecipe(r1);
+		cm.addRecipe(r2);
 		String recipe = r1.getName();
 		assertEquals(recipe, cm.deleteRecipe(0));
-		assertEquals("",cm.deleteRecipe(0));
+		assertEquals(null,cm.deleteRecipe(0));
 	}
 	@Test
 	public void testEditRecipe() {
+		cm.addRecipe(r1);
+		cm.addRecipe(r2);
 		String name = r1.getName();
 		assertEquals(name,cm.editRecipe(0,r2));
-		assertNotEquals(name,r1.getName());
+		assertNotEquals(name,cm.getRecipes()[0]);
 	}
 	@Test
 	public void testCheckInventory() {
@@ -135,6 +128,14 @@ public class ExampleTest {
 		inv.useIngredients(r1);
 		inv.useIngredients(r1);
 		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+		inv.useIngredients(r1);
+
 		assertEquals(false, inv.enoughIngredients(r1));
 	}
 
@@ -143,7 +144,6 @@ public class ExampleTest {
 		Inventory inv = new Inventory();
 		int coffee = inv.getCoffee();
 		inv.useIngredients(r1);
-		assertEquals(false,r1);
 		assertTrue(coffee > inv.getCoffee());
 	}
 	@Test
@@ -156,6 +156,70 @@ public class ExampleTest {
 		recipe.setAmtSugar("100");
 		assertEquals(false,inv.useIngredients(recipe));
 	}
+	@Test
+	public void testAddSugar() throws Exception {
+		Inventory inv = new Inventory();
+		int prevSugar = inv.getSugar();
+		inv.addSugar("5");
+		int newSugar = inv.getSugar();
+		assertNotEquals(prevSugar,newSugar);
+		assertEquals(prevSugar+5,inv.getSugar());
+	}
 
+	@Test
+	public void testRecipeSetPrice() throws Exception {
+		Recipe recipe = new Recipe();
+		recipe.setPrice("500");
+		assertEquals(500,recipe.getPrice());
+		recipe.setPrice("-500");
+		assertEquals(-500,recipe.getPrice());
+	}
+
+	@Test
+	public void testRecipeBookAddRecipe() {
+		RecipeBook recipeBook = new RecipeBook();
+		assertEquals(true, recipeBook.addRecipe(r1));
+		assertEquals(false, recipeBook.addRecipe(r1));
+		assertEquals(r1, recipeBook.getRecipes()[0]);
+	}
+
+	@Test
+	public void testRecipeGettersAndSetters() throws Exception{
+		Recipe recipe = new Recipe();
+		recipe.setPrice("5");
+		recipe.setAmtSugar("5");
+		recipe.setName("5");
+		recipe.setAmtMilk("5");
+		recipe.setAmtCoffee("5");
+		recipe.setAmtChocolate("5");
+
+		assertEquals(5,recipe.getPrice());
+		assertEquals(5,recipe.getAmtSugar());
+		assertEquals("5",recipe.getName());
+		assertEquals(5,recipe.getAmtMilk());
+		assertEquals(5,recipe.getAmtCoffee());
+		assertEquals(5,recipe.getAmtChocolate());
+
+	}
+
+	@Test
+	public void testInventoryGetSetAdd() throws Exception {
+		Inventory inv = new Inventory();
+		inv.setChocolate(10);
+		inv.setCoffee(10);
+		inv.setMilk(10);
+		inv.setSugar(10);
+
+		inv.addChocolate("10");
+		inv.addCoffee("10");
+		inv.addMilk("10");
+		inv.addSugar("10");
+
+		assertEquals(20,inv.getChocolate());
+		assertEquals(20,inv.getCoffee());
+		assertEquals(20,inv.getMilk());
+		assertEquals(20,inv.getSugar());
+
+	}
 }
 

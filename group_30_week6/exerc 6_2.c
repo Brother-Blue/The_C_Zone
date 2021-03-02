@@ -18,48 +18,51 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#define num_elems 200
-int array[200];
-int max_value;
 
+#define num_elems 200 // declare constant of value 200
+int array[200]; // declare array of size 200
+int max_value; // declare variable
+
+/* Declare methods */
 void *runner(void *param);
 void *swap(void *param);
 void *search(void *param);
 
+/* Main */
 int main() {
-	time_t t;
-	pthread_t tid;
-	pthread_attr_t attr;
+	time_t t; // declare time
+	pthread_t tid; // declare thread id
+	pthread_attr_t attr; // declare thread attribute
 	
 	srand((unsigned) time(&t));
 	pthread_attr_init(&attr);
 
 	printf("Enter max value\n");
 	scanf("%d", &max_value);
-
-	pthread_create(&tid, &attr, runner, NULL);
-    pthread_join(tid, NULL);
-    pthread_create(&tid, &attr, swap, NULL);
-    pthread_join(tid, NULL);
-    pthread_create(&tid, &attr, search, NULL);
-    pthread_join(tid, NULL);
+	pthread_create(&tid, &attr, runner, NULL); // creates thread nr1
+    pthread_join(tid, NULL); // wait for thread nr1 to finish
+    pthread_create(&tid, &attr, swap, NULL); // creates thread nr2
+    pthread_join(tid, NULL); // wait for thread nr2 to finish
+    pthread_create(&tid, &attr, search, NULL); // creates thread n3
+    pthread_join(tid, NULL); // wait for thread nr3 to finish
     
 	return 0;
 }
 
+// Define methods
 
 // generates an array of integer values, running in a thread.
 void *runner(void *param) {
-	int c = 0, n=0;
+	int c = 0, n=0; // variables for use in for loops.
     printf("Executing runner 1");
 	for (c = 0; c < num_elems; c++) {
 		for(n=0; n<1000; n++); // To delay a bit 
 		array[c] = rand() % max_value;
 	}
-
 	pthread_exit(0);
 }
 
+// sorts the array from lowest to highest by swapping.
 void *swap(void *param) {
     int c, d, swap;
     printf("\nExecuting runner 2");
@@ -72,10 +75,10 @@ void *swap(void *param) {
 			}
 		}
 	}
-    
     pthread_exit(0);
 }
 
+// searches for a number given by the user and prints the position of it
 void *search(void *param) {
 	int search;
 	printf("\nEnter value to find\n");

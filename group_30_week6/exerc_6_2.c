@@ -8,13 +8,8 @@
  Hjalmar Thunberg
  Member not present at demonstration time:
  Hugo Hempel
- Demonstration code: [XXXX]
+ Demonstration code: [9421]
  ====================================== */
-
-// Program for exercise 6.2alt in DIT632
-// Version 2020-02-12
-// File : sortandfind_20.c
-// **************************************
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>

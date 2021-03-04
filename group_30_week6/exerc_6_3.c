@@ -7,7 +7,7 @@
  Hugo Hempel
  Hjalmar Thunberg
  Member not present at demonstration time:
- Demonstration code: [XXXX]
+ Demonstration code: [9421]
  ====================================== */
 
 #include <pthread.h>
@@ -96,7 +96,6 @@ void *isClosedSensor(void *param) {
 // Open door if it is closed
 void openDoor() {
     // Set bit 6
-}
 
 // Check if the door is in the opening state
 int isOpening() {

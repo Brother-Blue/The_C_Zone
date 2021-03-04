@@ -1,5 +1,5 @@
  /* ====================================
- File name: exerc_6_4.c
+ File name: exerc_6_5.c
  Date: 2021-03-02
  Group 30
  Members that contribute to the solutions
@@ -7,64 +7,88 @@
  Hugo Hempel
  Hjalmar Thunberg
  Member not present at demonstration time:
- Demonstration code: [XXXX]
+ Demonstration code: [9421]
  ====================================== */
 
 #include <stdio.h>
 #include <sys/time.h>
+#include <stdlib.h>
 #include <pthread.h>
 
-/* Declare thread methods */
-void *time_count(void *param);
-void *read_inport(void *param);
+pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t not_empty    = PTHREAD_COND_INITIALIZER;
+pthread_cond_t not_full     = PTHREAD_COND_INITIALIZER;
+
+/* Declare global variables */
+#define MAX 10
+
+/* Declare variables */
+char letter = 'a';  // starting letter
+char buffer[MAX];   // circular buffer. Test for MAX 5 and 10.
+int inPos;          // index for next character to be put in buffer. (put)
+int outPos;         // index for next character to be read (fetch)
+int count;          // the number of characters in buffer not fetched.
 
 /* Declare methods */
 double get_time_ms();
 void snooze(int ms);
 
-int program_time; // The global time, start value 0
+/* Declare thread methods */
+void *put(void *param);
+void *fetch(void *param);
 
-// ------MAIN------
+ /* Main */
 int main() {
+    int i;
+    pthread_t t_put, t_fetch;
+    pthread_attr_t attr;
 
-    pthread_t t_time_count, t_read_inport; // Init thread variables
-    pthread_attr_t attr; // Init thread attr
-    
-    // Assign the thread attr
     pthread_attr_init(&attr);
-    
-    // Create the threads
-    pthread_create(&t_read_inport, &attr, read_inport, NULL);
-    pthread_create(&t_time_count, &attr, time_count, NULL);     
 
-    // Join the threads
-    pthread_join(t_time_count, NULL);
-    pthread_join(t_read_inport, NULL);
+    pthread_create(&t_put, &attr, put, NULL);
+    pthread_create(&t_fetch, &attr, fetch, NULL);
+    while(1) {
+
+    }
+    pthread_join(t_put, NULL);
+    pthread_join(t_fetch, NULL);
+    return 0;
 }
-// --- End of main thread ----
 
-// ---- Thread functions -----
-// Program timer
-void *time_count(void *param) {
-    while (program_time < 50) {
-        // Print the current program time, increment it, then sleep for 1 second
-        printf("\r Program time: %d", program_time); 
-        program_time++;
-        snooze(1000);
+void *put(void *param) {
+    char ch = 'a';
+    int placed = 0;
+    pthread_mutex_lock(&count_mutex);
+    while(1) {
+        if (count == MAX) {
+            pthread_cond_wait(&not_full, &count_mutex);
+
+        }
+        buffer[inPos] = ch;
+        count++;
+        inPos = inPos == MAX-1 ? 0 : inPos++;
+        pthread_mutex_unlock(&count_mutex);
+        pthread_cond_signal(&not_empty);
+        ch = ch == 'z' ? 'a' : ch++;
     }
-    // exit thread
     pthread_exit(0);
-} // End----------------------
+}
 
-// Reads the inport
-void *read_inport(void *param) {
-    // Keep reading until program_time ends
-    while ( program_time < 50) {
-        // Read every 5 seconds and print a message
-        snooze(5000);
-        printf("\n Reading Inport now...\n");
+void *fetch(void *param) {
+    int fetched = 0;
+    while(1) {
+        snooze(500);
+        pthread_mutex_lock(&count_mutex);
+        if(count <= 0) {
+            pthread_cond_wait(&not_empty, &count_mutex);
+        }
+        printf("\n%c number to be yote", buffer[outPos], "ddddddddd", count);
+        buffer[outPos] = NULL;
+        count--;
+        outPos = outPos == MAX-1 ? 0 : outPos++;
+        pthread_mutex_unlock(&count_mutex);
+        pthread_cond_signal(&not_full);
     }
-    printf("\n done");
     pthread_exit(0);
 }
 

@@ -7,10 +7,11 @@
  Hugo Hempel
  Hjalmar Thunberg
  Member not present at demonstration time:
- Demonstration code: [XXXX]
+ Demonstration code: [9421]
  ====================================== */
 
 #include <stdio.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <pthread.h>
 
@@ -28,6 +29,10 @@ int inPos;          // index for next character to be put in buffer. (put)
 int outPos;         // index for next character to be read (fetch)
 int count;          // the number of characters in buffer not fetched.
 
+/* Declare methods */
+double get_time_ms();
+void snooze(int ms);
+
 /* Declare thread methods */
 void *put(void *param);
 void *fetch(void *param);
@@ -40,13 +45,14 @@ int main() {
 
     pthread_attr_init(&attr);
 
-     (&t_put, &attr, put, NULL);
+    pthread_create(&t_put, &attr, put, NULL);
     pthread_create(&t_fetch, &attr, fetch, NULL);
     while(1) {
-        
+        printf("Main is executing\n");
+        snooze(100);
     }
-    pthread_join(t_time_count, NULL);
-    pthread_join(t_read_inport, NULL);
+    pthread_join(t_put, NULL);
+    pthread_join(t_fetch, NULL);
     return 0;
 }
 
@@ -55,43 +61,65 @@ void *put(void *param) {
     int placed = 0;
     pthread_mutex_lock(&count_mutex);
     while(1) {
-        pthread_cond_wait(&not_full, &count_mutex);
-        for (int i = 0; i < MAX; i++) {
-            if (sizeof(buffer[i]) != sizeof(char)) {
-                buffer[i] = ch;
-                placed = 1;
-                break;
-            }
+
+        if (count == MAX) {
+            pthread_cond_wait(&not_full, &count_mutex);
+            printf("Buffer full.\n");
         }
+        buffer[inPos] = ch;
+        count++;
+        inPos++;
+        if (inPos == MAX)
+        {
+            inPos = 0;
+        } 
+        printf("Buffer storing\n");
+        pthread_cond_signal(&not_empty);
         pthread_mutex_unlock(&count_mutex);
-        if (placed) {
-            pthread_cond_signal(&not_empty);
+       
+        ch++;
+        if (ch == 'z'+1) {
+            ch = 'a';
         }
-        placed = 0;
-        ch = ch == 'z' ? 'a' : ch++;
     }
     pthread_exit(0);
 }
 
 void *fetch(void *param) {
     int fetched = 0;
-    pthread_mutex_lock(&count_mutex);
     while(1) {
-        pthread_cond_wait(&not_empty, &count_mutex);
-        for (int i = 0; i < MAX; i++) {
-            if (sizeof(buffer[i]) == sizeof(char)) {
-                printf("Character found: %c\n", buffer[i]);
-                buffer[i] = '\0';
-                fetched = 1;
-                break;
-            }
+
+        pthread_mutex_lock(&count_mutex);
+        if(count <= 0) {
+            pthread_cond_wait(&not_empty, &count_mutex);
+            printf("Buffer empty.\n");
         }
+        printf("Buffer output: %c\n", buffer[outPos]);
+        buffer[outPos] = NULL;
+        count--;
+        outPos++;
+        if (outPos == MAX) {
+            outPos = 0;
+        }
+        pthread_cond_signal(&not_full);
         pthread_mutex_unlock(&count_mutex);
-        if (fetched) {
-            pthread_cond_signal(&not_full);
-        }
-        fetched = 0;
+        
     }
     pthread_exit(0);
 }
 
+// Sleep for x milliseconds
+void snooze(int ms) {
+    double prevTime = get_time_ms(); // Get the current system time
+    double curTime = prevTime; // Get the current system time
+    // Check the current time until desired sleep time passed
+    while ((curTime - prevTime) <= ms) {
+        curTime = get_time_ms();
+    }
+}
+
+double get_time_ms(){        
+    struct timeval t;        
+    gettimeofday(&t, NULL);         
+    return (t.tv_sec + (t.tv_usec / 1000000.0)) * 1000.0;
+}

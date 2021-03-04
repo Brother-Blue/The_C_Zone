@@ -35,15 +35,18 @@ int main() {
     // initialise the thread with default values
     pthread_attr_init(&attr);
     
-    // Creates threads for all sensors
-    pthread_create(&sensorCheck, &attr, checkSensor, NULL);
-    pthread_create(&isOpen, &attr, isOpenSensor, NULL);
-    pthread_create(&isClosed, &attr, isClosedSensor, NULL);
+    while (1)
+    {
+        // Creates threads for all sensors
+        pthread_create(&sensorCheck, &attr, checkSensor, NULL);
+        pthread_create(&isOpen, &attr, isOpenSensor, NULL);
+        pthread_create(&isClosed, &attr, isClosedSensor, NULL);
 
-    // Join the threads when finished
-    pthread_join(sensorCheck, NULL);
-    pthread_join(isOpen, NULL);
-    pthread_join(isClosed, NULL);
+        // Join the threads when finished
+        pthread_join(sensorCheck, NULL);
+        pthread_join(isOpen, NULL);
+        pthread_join(isClosed, NULL);
+    }
     
     return 0;
 }
@@ -64,9 +67,6 @@ void *checkSensor(void *param) {
     if (checkBit(3, ML13_Status)) {
         if (!isOpening())
         openDoor(); // Open door
-        checkSensor();
-    } else {
-        checkSensor();
     }
     pthread_exit(0);
 }
@@ -88,9 +88,6 @@ void *isClosedSensor(void *param) {
     // If bit 5 is set
     if (checkBit(5, ML13_Status)) {
         // Door is closed
-        isClosedSensor();
-    } else {
-        isClosedSensor();
     }
     pthread_exit(0);
 }
@@ -111,11 +108,10 @@ int isOpening() {
 void *isOpenSensor(void *param) {
     // If bit 4 is set, delay then close
     if (checkBit(4, ML13_Status)) {
-        delay();
-        closeDoor(); // Close door
-        isOpenSensor();
-    } else {
-        isOpenSensor();
+        if(!isClosing()) {
+            delay(); // delay
+            closeDoor(); // Close door
+        }
     }
     pthread_exit(0);
 }

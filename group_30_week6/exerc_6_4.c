@@ -48,7 +48,7 @@ int main() {
 void *time_count(void *param) {
     while (program_time < 50) {
         // Print the current program time, increment it, then sleep for 1 second
-        printf("Program time: %d\n", program_time);
+        printf("\r Program time: %d", program_time); 
         program_time++;
         snooze(1000);
     }
@@ -62,7 +62,7 @@ void *read_inport(void *param) {
     while ( program_time < 50) {
         // Read every 5 seconds and print a message
         snooze(5000);
-        printf("Reading Inport now...\n");
+        printf("\n Reading Inport now...\n");
     }
     printf("\n done");
     pthread_exit(0);
